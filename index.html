@@ -1,148 +1,117 @@
-
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BORN TO STREAM | ULTIMATE DATABASE</title>
+    <title>BORN TO STREAM | EXCLUSIVE LEAKS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
-        .nav-glass { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid #1a1a1a; }
-        .v-card { transition: all 0.3s ease; border: 1px solid #111; }
-        .v-card:hover { transform: translateY(-8px); border-color: #ff0000; box-shadow: 0 10px 20px rgba(255,0,0,0.2); }
-        .badge-live { background: linear-gradient(90deg, #ff0000, #990000); animation: pulse 1.5s infinite; }
+        body { background: #000; color: #fff; font-family: system-ui, -apple-system, sans-serif; }
+        .v-card { background: #050505; border: 1px solid #111; transition: 0.3s; position: relative; overflow: hidden; border-radius: 8px; }
+        .v-card:hover { border-color: #ff0000; transform: scale(1.02); }
+        .live-tag { position: absolute; top: 8px; right: 8px; background: #ff0000; color: white; font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        #notification { position: fixed; bottom: 20px; left: 20px; background: rgba(20,20,20,0.9); padding: 10px 20px; border-radius: 50px; border: 1px solid #333; font-size: 10px; display: none; z-index: 1000; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #player { display:none; position:fixed; inset:0; background: #000; z-index: 9999; flex-direction: column; }
     </style>
 </head>
 <body class="bg-black">
 
-    <div id="notification">👤 <span id="notify-user"></span> just unlocked a Leak!</div>
-
-    <nav class="nav-glass sticky top-0 z-[100] px-4 py-3 flex justify-between items-center">
-        <div class="text-2xl font-black italic text-red-600 tracking-tighter">BORN<span class="text-white">TO</span></div>
-        <div class="flex gap-4 overflow-x-auto no-scrollbar max-w-[50%] md:max-w-none">
-            <button onclick="changeCat('trending')" class="text-[10px] font-bold uppercase hover:text-red-500 whitespace-nowrap">Trending</button>
-            <button onclick="changeCat('amateur')" class="text-[10px] font-bold uppercase hover:text-red-500 whitespace-nowrap">Amateur</button>
-            <button onclick="changeCat('home')" class="text-[10px] font-bold uppercase hover:text-red-500 whitespace-nowrap">Home Video</button>
-            <button onclick="changeCat('verified')" class="text-[10px] font-bold uppercase hover:text-red-500 whitespace-nowrap text-blue-500">Verified</button>
+    <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-zinc-900 px-6 py-4 flex justify-between items-center">
+        <div class="text-2xl font-black italic tracking-tighter text-red-600">BORN<span class="text-white">TO</span></div>
+        <div class="flex gap-4">
+            <button onclick="fetchVideos('trending')" class="text-[10px] font-bold uppercase hover:text-red-500">Trending</button>
+            <button onclick="fetchVideos('leaks')" class="text-[10px] font-bold uppercase hover:text-red-500 text-red-500">Leaks</button>
         </div>
-    </nav>
+    </header>
 
     <main class="p-4 md:p-8">
         <div class="flex items-center gap-2 mb-6">
-            <div class="h-4 w-1 bg-red-600"></div>
-            <h2 id="cat-title" class="text-xl font-black uppercase italic tracking-widest">Trending Now</h2>
+            <div class="h-5 w-1 bg-red-600"></div>
+            <h2 id="title" class="text-xl font-black uppercase italic tracking-widest">Global Database</h2>
         </div>
 
-        <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div class="col-span-full text-center py-20 text-zinc-800 font-black animate-pulse uppercase italic">
+                Bypassing Server Security...
             </div>
-
-        <div id="loader" class="text-center py-10 opacity-50 text-xs font-bold uppercase tracking-widest">
-            Scanning Servers for more Leaks...
         </div>
     </main>
 
-    <div id="player" class="fixed inset-0 bg-black z-[2000] hidden flex flex-col">
-        <div class="p-4 flex justify-between items-center border-b border-zinc-900">
-            <div class="badge-live text-[8px] font-black px-2 py-1 rounded">ENCRYPTED STREAM</div>
-            <button onclick="closeP()" class="text-white font-black text-xs hover:text-red-600">CLOSE [X]</button>
+    <div id="player">
+        <div class="p-4 flex justify-between items-center bg-zinc-950 border-b border-zinc-900">
+            <span class="text-[10px] font-black text-red-600 uppercase tracking-widest">Premium Encrypted Stream</span>
+            <button onclick="closeP()" class="bg-red-600 px-5 py-1 rounded text-[10px] font-black text-white">CLOSE X</button>
         </div>
-        <div class="flex-1 relative">
-            <div id="shield" class="absolute inset-0 z-50 bg-zinc-950 flex flex-col items-center justify-center p-6 text-center" onclick="pop()">
-                <div class="text-red-600 text-5xl mb-4 animate-bounce">🔒</div>
-                <h3 class="text-xl font-black mb-2 uppercase">Server Protected Content</h3>
-                <p class="text-[9px] text-zinc-500 mb-6 max-w-xs">To prevent bot scraping, please complete the human verification by clicking the button below.</p>
-                <button class="bg-red-600 text-white px-10 py-4 rounded-full font-black text-sm shadow-[0_0_20px_rgba(255,0,0,0.4)]">VERIFY & PLAY</button>
+        <div class="flex-1 relative overflow-hidden bg-black">
+            <div id="shield" class="absolute inset-0 z-50 bg-zinc-950/98 flex flex-col items-center justify-center text-center p-6" onclick="handlePop()">
+                <div class="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-6"></div>
+                <h3 class="text-2xl font-black mb-2">HUMAN VERIFICATION</h3>
+                <p class="text-zinc-500 text-[10px] uppercase mb-8 tracking-widest max-w-xs">Click the button below to verify you are not a bot and start the stream</p>
+                <button class="bg-red-600 text-white px-12 py-4 rounded-full font-black text-sm shadow-[0_0_30px_rgba(220,38,38,0.5)] transform hover:scale-105 transition-all">UNLOCK CONTENT</button>
             </div>
-            <iframe id="frame" src="" class="w-full h-full border-none"></iframe>
+            <iframe id="frame" class="w-full h-full border-none" src="" allowfullscreen></iframe>
         </div>
     </div>
 
-<script>
-    let page = 1;
-    let currentCat = 'trending';
-    let loading = false;
-    let clicks = 0;
-    const pops = ["https://www.profitablecpmratenetwork.com/uquv8zzw?key=08ac4178b82923bddd5e0782a47223ab"];
-    const proxy = 'https://api.allorigins.win/get?url=';
+    <script>
+        let adClicks = 0;
+        const myAdLink = "https://www.profitablecpmratenetwork.com/uquv8zzw?key=08ac4178b82923bddd5e0782a47223ab"; // לינק הפרסומת שלך
+        const proxy = "https://api.codetabs.com/v1/proxy?quest="; // הפרוקסי החדש והחזק
 
-    async function load(q, p) {
-        if(loading) return;
-        loading = true;
-        const grid = document.getElementById('grid');
-        const url = `https://www.eporner.com/api/v2/video/search/?query=${q}&per_page=30&page=${p}&thumbsize=big`;
-        
-        try {
-            const r = await fetch(proxy + encodeURIComponent(url));
-            const d = await r.json();
-            const videos = JSON.parse(d.contents).videos;
+        async function fetchVideos(query = 'trending') {
+            const grid = document.getElementById('grid');
+            const title = document.getElementById('title');
+            title.innerText = query + " Database";
             
-            videos.forEach(v => {
-                grid.innerHTML += `
-                    <div class="v-card bg-zinc-950 rounded-lg overflow-hidden relative group" onclick="play('${v.id}')">
-                        <img src="${v.default_thumb.src}" class="w-full aspect-[4/5] object-cover opacity-80 group-hover:opacity-100">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-60"></div>
-                        <div class="absolute bottom-0 p-2 w-full">
-                            <div class="text-[9px] font-black uppercase truncate">${v.title}</div>
-                            <div class="flex justify-between text-[7px] text-zinc-500 mt-1 font-bold">
-                                <span>${v.views} VIEWS</span>
-                                <span class="text-red-600 italic">HD LEAK</span>
+            const apiUrl = `https://www.eporner.com/api/v2/video/search/?query=${query}&per_page=48&thumbsize=big`;
+            
+            try {
+                const response = await fetch(proxy + encodeURIComponent(apiUrl));
+                const data = await response.json();
+                
+                grid.innerHTML = '';
+                data.videos.forEach(v => {
+                    grid.innerHTML += `
+                        <div class="v-card" onclick="openPlayer('${v.id}')">
+                            <div class="live-tag">LIVE</div>
+                            <img src="${v.default_thumb.src}" class="w-full aspect-video object-cover opacity-80 hover:opacity-100 transition-opacity">
+                            <div class="p-2">
+                                <div class="text-[9px] font-black truncate uppercase text-zinc-400">${v.title}</div>
+                                <div class="flex justify-between mt-1 text-[7px] font-bold text-zinc-600">
+                                    <span>${v.views} VIEWS</span>
+                                    <span class="text-red-900 italic">${v.length_min} MIN</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            });
-            loading = false;
-        } catch(e) { console.log(e); }
-    }
-
-    function changeCat(cat) {
-        currentCat = cat;
-        page = 1;
-        document.getElementById('grid').innerHTML = '';
-        document.getElementById('cat-title').innerText = cat;
-        load(cat, 1);
-    }
-
-    function play(id) {
-        clicks = 0;
-        document.getElementById('player').style.display = 'flex';
-        document.getElementById('shield').style.display = 'flex';
-        document.getElementById('frame').src = `https://www.eporner.com/embed/${id}/`;
-    }
-
-    function pop() {
-        window.open(pops[0], '_blank');
-        clicks++;
-        if(clicks >= 2) document.getElementById('shield').style.display = 'none';
-    }
-
-    function closeP() {
-        document.getElementById('player').style.display = 'none';
-        document.getElementById('frame').src = '';
-    }
-
-    // Infinite Scroll
-    window.onscroll = function() {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800) {
-            page++;
-            load(currentCat, page);
+                    `;
+                });
+            } catch (e) {
+                grid.innerHTML = '<div class="col-span-full text-center text-red-600 font-bold py-20">CONNECTION ERROR: REFRESH PAGE OR DISABLE ADBLOCK</div>';
+            }
         }
-    };
 
-    // Fake Notifications
-    const names = ["User742", "Anon_99", "ProStreamer", "LeakHunter", "King_22", "Guest_88"];
-    setInterval(() => {
-        const n = document.getElementById('notification');
-        document.getElementById('notify-user').innerText = names[Math.floor(Math.random()*names.length)];
-        n.style.display = 'block';
-        setTimeout(() => n.style.display = 'none', 3000);
-    }, 8000);
+        function openPlayer(id) {
+            adClicks = 0;
+            document.getElementById('player').style.display = 'flex';
+            document.getElementById('shield').style.display = 'flex';
+            document.getElementById('frame').src = `https://www.eporner.com/embed/${id}/`;
+        }
 
-    load('trending', 1);
-</script>
+        function handlePop() {
+            window.open(myAdLink, '_blank'); // פותח את הפרסומת שלך
+            adClicks++;
+            if(adClicks >= 2) {
+                document.getElementById('shield').style.display = 'none';
+            }
+        }
+
+        function closeP() {
+            document.getElementById('player').style.display = 'none';
+            document.getElementById('frame').src = '';
+        }
+
+        // טעינה ראשונית
+        fetchVideos('trending');
+    </script>
 </body>
 </html>
