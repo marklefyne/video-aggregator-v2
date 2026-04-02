@@ -1,127 +1,96 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BORN TO STREAM | LEAKS</title>
+    <title>BORN TO STREAM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #050505; color: white; font-family: sans-serif; margin: 0; }
-        .sidebar { width: 250px; background: #000; border-left: 1px solid #111; height: 100vh; position: fixed; right: 0; top: 0; z-index: 1000; }
-        .main-content { margin-right: 250px; padding: 20px; }
-        .video-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s; }
-        .video-card:hover { border-color: #ff0000; transform: translateY(-5px); }
-        .player-overlay { display:none; position:fixed; inset:0; background: #000; z-index: 9999; }
+        body { background: #050505; color: white; font-family: sans-serif; }
+        .v-card { background: #0a0a0a; border: 1px solid #1a1a1a; cursor: pointer; transition: 0.3s; border-radius: 8px; overflow: hidden; }
+        .v-card:hover { border-color: red; }
+        .player { display:none; position:fixed; inset:0; background: #000; z-index: 9999; }
         iframe { width: 100%; height: 100%; border: none; }
-        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-right: 0; } }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="p-8 text-2xl font-black italic text-red-600">BORN<span class="text-white">TO</span></div>
-    <nav class="space-y-2">
-        <div onclick="loadVideos('trending')" class="px-8 py-3 text-sm font-bold text-gray-400 hover:text-white cursor-pointer uppercase">Trending</div>
-        <div onclick="loadVideos('new')" class="px-8 py-3 text-sm font-bold text-gray-400 hover:text-white cursor-pointer uppercase">New Uploads</div>
-        <div onclick="fetchByTag('Amateur')" class="px-8 py-3 text-sm font-bold text-gray-400 hover:text-white cursor-pointer uppercase">Amateur Leaks</div>
-        <div onclick="fetchByTag('Home Video')" class="px-8 py-3 text-sm font-bold text-gray-400 hover:text-white cursor-pointer uppercase">Home Made</div>
-    </nav>
-</div>
-
-<div class="main-content">
-    <div class="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
-        <h2 class="text-xl font-black uppercase tracking-tighter">Exclusive Content</h2>
-        <input type="text" id="search" placeholder="Search for leaks..." 
-               class="bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-lg w-full max-w-md text-sm outline-none focus:border-red-600"
-               onkeydown="if(event.key==='Enter') fetchByTag(this.value)">
+<div class="p-5">
+    <div class="flex justify-between items-center mb-10">
+        <h1 class="text-3xl font-black italic text-red-600">BORN<span class="text-white">TO</span></h1>
+        <div class="flex gap-4">
+            <button onclick="loadContent('trending')" class="text-xs font-bold uppercase border-b-2 border-red-600">Trending</button>
+            <button onclick="loadContent('new')" class="text-xs font-bold uppercase text-gray-500 hover:text-white">Newest</button>
+        </div>
     </div>
 
-    <div id="video-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div class="col-span-full text-center py-20 text-gray-600 font-bold uppercase animate-pulse">
+            טוען סרטונים... אם לא נטען תוך 5 שניות, כבה AdBlock
         </div>
+    </div>
 </div>
 
-<div id="player" class="player-overlay">
-    <div class="p-4 flex justify-between items-center bg-zinc-900">
-        <span class="text-xs font-black text-red-600 uppercase animate-pulse">Live Stream Unlocked</span>
-        <button onclick="closePlayer()" class="bg-red-600 text-white px-4 py-1 rounded font-black text-xs">CLOSE X</button>
+<div id="player" class="player">
+    <div class="p-4 flex justify-between bg-zinc-900 items-center">
+        <button onclick="closeP()" class="bg-red-600 px-4 py-1 rounded font-black text-xs">CLOSE X</button>
     </div>
-    <div class="w-full h-[85vh] relative">
-        <div id="ad-shield" class="absolute inset-0 z-50 bg-black/90 flex flex-col items-center justify-center cursor-pointer" onclick="handleAdClick()">
-            <div class="bg-red-600 text-white px-12 py-4 rounded-full font-black text-lg shadow-2xl mb-4">CLICK TO UNLOCK VIDEO</div>
-            <p class="text-gray-500 text-sm">Waiting for server authentication...</p>
+    <div class="w-full h-full relative">
+        <div id="shield" class="absolute inset-0 z-50 bg-black/90 flex flex-col items-center justify-center cursor-pointer" onclick="openPop()">
+            <div class="bg-red-600 px-10 py-4 rounded-full font-black text-sm uppercase mb-2">Unlock Video</div>
         </div>
-        <iframe id="video-frame" src="" allowfullscreen></iframe>
+        <iframe id="frame" src=""></iframe>
     </div>
 </div>
 
 <script>
-    let clickCount = 0;
-    // לינקים לפרסומות שלך (תחליף במידת הצורך)
-    const adLinks = [
-        "https://www.profitablecpmratenetwork.com/uquv8zzw?key=08ac4178b82923bddd5e0782a47223ab",
-        "https://www.profitablecpmratenetwork.com/a2sq5cxqr?key=5c7ed8437653417a133efaf460c081c9"
-    ];
+    let clicks = 0;
+    const pops = ["https://www.profitablecpmratenetwork.com/uquv8zzw?key=08ac4178b82923bddd5e0782a47223ab"];
 
-    async function loadVideos(query = 'trending') {
-        const grid = document.getElementById('video-grid');
-        grid.innerHTML = '<div class="col-span-full text-center py-20 text-zinc-700 font-black italic">FETCHING DATABASE...</div>';
-        
+    async function loadContent(query) {
+        const grid = document.getElementById('grid');
+        // שימוש ב-Proxy כדי לעקוף חסימות דפדפן
+        const proxyUrl = 'https://api.allorigins.win/get?url=';
+        const apiUrl = encodeURIComponent(`https://www.eporner.com/api/v2/video/search/?query=${query}&per_page=20`);
+
         try {
-            // שימוש ב-API של Eporner - עובד מעולה עם GitHub Pages
-            const response = await fetch(`https://www.eporner.com/api/v2/video/search/?query=${query}&per_page=24&thumbsize=big`);
-            const data = await response.json();
-            render(data.videos);
-        } catch (error) {
-            grid.innerHTML = '<div class="col-span-full text-center text-red-500">Connection Error. Check your internet.</div>';
-        }
-    }
-
-    async function fetchByTag(tag) {
-        loadVideos(tag);
-    }
-
-    function render(videos) {
-        const grid = document.getElementById('video-grid');
-        grid.innerHTML = '';
-        videos.forEach(v => {
-            const div = document.createElement('div');
-            div.className = 'video-card';
-            div.onclick = () => openPlayer(v.id);
-            div.innerHTML = `
-                <img src="${v.default_thumb.src}" class="w-full aspect-video object-cover">
-                <div class="p-3">
-                    <div class="text-[10px] font-black text-zinc-500 uppercase truncate">${v.title}</div>
-                    <div class="flex justify-between mt-2 text-[9px] text-zinc-600">
-                        <span>${v.length_min} min</span>
-                        <span class="text-red-900">${v.views} views</span>
+            const r = await fetch(proxyUrl + apiUrl);
+            const data = await r.json();
+            const d = JSON.parse(data.contents); // פיענוח הנתונים מה-Proxy
+            
+            grid.innerHTML = '';
+            d.videos.forEach(v => {
+                grid.innerHTML += `
+                    <div class="v-card" onclick="playV('${v.id}')">
+                        <img src="${v.default_thumb.src}" class="w-full aspect-video object-cover">
+                        <div class="p-2 text-[10px] font-bold text-gray-500 truncate uppercase">${v.title}</div>
                     </div>
-                </div>
-            `;
-            grid.appendChild(div);
-        });
-    }
-
-    function openPlayer(id) {
-        clickCount = 0;
-        document.getElementById('player').style.display = 'block';
-        document.getElementById('ad-shield').style.display = 'flex';
-        document.getElementById('video-frame').src = `https://www.eporner.com/embed/${id}/`;
-    }
-
-    function handleAdClick() {
-        window.open(adLinks[clickCount % adLinks.length], '_blank');
-        clickCount++;
-        if (clickCount >= 2) {
-            document.getElementById('ad-shield').style.display = 'none';
+                `;
+            });
+        } catch(e) {
+            grid.innerHTML = `<div class="col-span-full text-center text-red-500">שגיאת חיבור. נסה לרענן או לכבות חוסם פרסומות.</div>`;
         }
     }
 
-    function closePlayer() {
-        document.getElementById('player').style.display = 'none';
-        document.getElementById('video-frame').src = '';
+    function playV(id) {
+        clicks = 0;
+        document.getElementById('player').style.display = 'block';
+        document.getElementById('shield').style.display = 'flex';
+        document.getElementById('frame').src = `https://www.eporner.com/embed/${id}/`;
     }
 
-    loadVideos();
+    function openPop() {
+        window.open(pops[0], '_blank');
+        clicks++;
+        if(clicks >= 2) document.getElementById('shield').style.display = 'none';
+    }
+
+    function closeP() {
+        document.getElementById('player').style.display = 'none';
+        document.getElementById('frame').src = '';
+    }
+
+    loadContent('trending');
 </script>
 
 </body>
