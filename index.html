@@ -1,41 +1,138 @@
-
 <!DOCTYPE html>
-<html lang="he">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MarkLefyne Site - Luxury Cinema</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <title>BORN TO STREAM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: white; }
-        .movie-card:hover { transform: scale(1.05); border-color: #d4af37; }
-        .gold-text { color: #d4af37; }
-        .gold-border { border: 1px solid #d4af37; }
+        :root { --bg-dark: #050505; --bg-sidebar: #000; --accent: #ff0000; }
+        body { background: var(--bg-dark); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        aside { 
+            width: 260px; background: var(--bg-sidebar); border-right: 1px solid #111; 
+            height: 100vh; position: fixed; left: 0; top: 0; z-index: 2000; 
+            transition: transform 0.3s; overflow-y: auto;
+        }
+        .nav-link { padding: 12px 25px; color: #555; cursor: pointer; font-weight: 800; text-transform: uppercase; font-size: 13px; }
+        .nav-link.active { color: white; border-left: 3px solid var(--accent); background: #0a0a0a; }
+
+        main { margin-left: 260px; min-height: 100vh; }
+        .top-bar { padding: 15px 25px; background: rgba(5,5,5,0.9); border-bottom: 1px solid #111; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 25px; }
+        .video-card { cursor: pointer; border-radius: 10px; overflow: hidden; background: #0a0a0a; border: 1px solid #111; transition: 0.3s; }
+        .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+        .video-card .v-title { padding: 10px; font-size: 11px; font-weight: 900; color: #666; text-transform: uppercase; height: 45px; overflow: hidden; }
+
+        .overlay { display:none; position:fixed; inset:0; background: #000; z-index: 3000; overflow-y: auto; }
+        .video-wrapper { width: 100%; height: 60vh; background: #000; position: relative; }
+        .ad-shield { position: absolute; inset: 0; z-index: 100; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            aside { transform: translateX(-100%); }
+            aside.open { transform: translateX(0); }
+            main { margin-left: 0; }
+        }
     </style>
 </head>
-<body class="p-8">
-    <header class="flex justify-between items-center mb-12 border-b border-gray-800 pb-4">
-        <h1 class="text-4xl font-bold italic gold-text tracking-tighter">STREM<span class="text-white">EX</span></h1>
-        <nav class="space-x-6 space-x-reverse">
-            <a href="#" class="hover:gold-text">סרטים</a>
-            <a href="#" class="hover:gold-text">סדרות</a>
-            <a href="#" class="hover:gold-text font-bold">VIP</a>
-        </nav>
-    </header>
+<body>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        <div class="movie-card bg-gray-900 rounded-lg overflow-hidden transition-all duration-300 gold-border">
-            <img src="https://via.placeholder.com/300x450/111/d4af37?text=Movie+Poster" alt="Poster">
-            <div class="p-4 text-center">
-                <h3 class="font-bold">שם הסרט כאן</h3>
-                <p class="text-xs text-gray-400">2026 | Action</p>
-                <button class="mt-4 bg-transparent border gold-border gold-text px-4 py-1 rounded hover:bg-gold-text hover:text-black transition">צפה עכשיו</button>
-            </div>
-        </div>
-        <div class="movie-card bg-gray-900 rounded-lg overflow-hidden gold-border opacity-50">
-            <img src="https://via.placeholder.com/300x450/111/d4af37?text=Coming+Soon" alt="Poster">
-        </div>
+<aside id="sidebar">
+    <div class="p-8 text-2xl font-black italic text-red-600">BORN<span class="text-white">TO</span></div>
+    <div class="nav-link active" onclick="loadVideos('stars')">Trending</div>
+    <div class="nav-link" onclick="loadVideos('newest')">Newest</div>
+    <div class="nav-link" onclick="loadVideos('mostviewed')">Popular</div>
+    <div class="border-t border-[#111] my-4"></div>
+    <div class="nav-link" onclick="searchTag('Anal')">Anal</div>
+    <div class="nav-link" onclick="searchTag('POV')">POV</div>
+    <div class="nav-link" onclick="searchTag('Milf')">MILF</div>
+    <div class="nav-link" onclick="searchTag('Teen')">Teen</div>
+</aside>
+
+<main>
+    <div class="top-bar">
+        <div class="cursor-pointer text-2xl md:hidden" onclick="toggleSide()">☰</div>
+        <input type="text" id="searchInput" placeholder="Search videos..." class="bg-[#0f0f0f] border border-[#1a1a1a] px-4 py-2 rounded-lg w-1/2 text-sm" onkeydown="if(event.key==='Enter') searchTag(this.value)">
+        <div class="text-xs font-black text-gray-700">18+ ADULTS ONLY</div>
     </div>
+    <div id="grid" class="movie-grid"></div>
+</main>
+
+<div id="player-overlay" class="overlay">
+    <div class="p-4 flex justify-between items-center border-bottom border-[#111]">
+        <div class="text-xl font-black">WATCHING NOW</div>
+        <button onclick="closePlayer()" class="bg-red-600 px-6 py-2 rounded font-black text-xs">CLOSE</button>
+    </div>
+    <div class="video-wrapper">
+        <div id="ad-shield" class="ad-shield" onclick="processPop()">
+            <div class="bg-red-600 px-8 py-3 rounded-full font-black text-sm uppercase">Click to Unlock Player</div>
+        </div>
+        <iframe id="main-frame" src="" allowfullscreen></iframe>
+    </div>
+</div>
+
+<script>
+    let adLeft = 2;
+    const popLinks = ["https://www.profitablecpmratenetwork.com/uquv8zzw?key=08ac4178b82923bddd5e0782a47223ab", "https://www.profitablecpmratenetwork.com/a2sq5cxqr?key=5c7ed8437653417a133efaf460c081c9"];
+
+    async function loadVideos(ordering = 'stars') {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-500 font-black animate-pulse">LOADING HARDCORE...</div>';
+        
+        try {
+            const r = await fetch(`https://api.redtube.com/?data=redtube.Videos.searchVideos&output=json&ordering=${ordering}&thumbsize=big`);
+            const d = await r.json();
+            render(d.videos);
+        } catch(e) { grid.innerHTML = "Error loading content."; }
+    }
+
+    async function searchTag(tag) {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        const r = await fetch(`https://api.redtube.com/?data=redtube.Videos.searchVideos&output=json&search=${tag}&thumbsize=big`);
+        const d = await r.json();
+        render(d.videos);
+        if(window.innerWidth <= 768) toggleSide();
+    }
+
+    function render(videos) {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        videos.forEach(v => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.onclick = () => openPlayer(v.video.video_id);
+            card.innerHTML = `
+                <img src="${v.video.default_thumb}">
+                <div class="v-title">${v.video.title}</div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function openPlayer(id) {
+        adLeft = 2;
+        document.getElementById('ad-shield').style.display = 'flex';
+        document.getElementById('player-overlay').style.display = 'block';
+        document.getElementById('main-frame').src = `https://embed.redtube.com/?id=${id}&bgcolor=000000`;
+    }
+
+    function processPop() {
+        window.open(popLinks[2 - adLeft] || popLinks[0], '_blank');
+        adLeft--;
+        if(adLeft <= 0) document.getElementById('ad-shield').style.display = 'none';
+    }
+
+    function closePlayer() {
+        document.getElementById('player-overlay').style.display = 'none';
+        document.getElementById('main-frame').src = '';
+    }
+
+    function toggleSide() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    loadVideos();
+</script>
+
 </body>
 </html>
