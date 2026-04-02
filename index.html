@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarkLefyne Site - Luxury Cinema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <style>
+        body { background-color: #050505; color: white; }
+        .movie-card:hover { transform: scale(1.05); border-color: #d4af37; }
+        .gold-text { color: #d4af37; }
+        .gold-border { border: 1px solid #d4af37; }
+    </style>
+</head>
+<body class="p-8">
+    <header class="flex justify-between items-center mb-12 border-b border-gray-800 pb-4">
+        <h1 class="text-4xl font-bold italic gold-text tracking-tighter">STREM<span class="text-white">EX</span></h1>
+        <nav class="space-x-6 space-x-reverse">
+            <a href="#" class="hover:gold-text">סרטים</a>
+            <a href="#" class="hover:gold-text">סדרות</a>
+            <a href="#" class="hover:gold-text font-bold">VIP</a>
+        </nav>
+    </header>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div class="movie-card bg-gray-900 rounded-lg overflow-hidden transition-all duration-300 gold-border">
+            <img src="https://via.placeholder.com/300x450/111/d4af37?text=Movie+Poster" alt="Poster">
+            <div class="p-4 text-center">
+                <h3 class="font-bold">שם הסרט כאן</h3>
+                <p class="text-xs text-gray-400">2026 | Action</p>
+                <button class="mt-4 bg-transparent border gold-border gold-text px-4 py-1 rounded hover:bg-gold-text hover:text-black transition">צפה עכשיו</button>
+            </div>
+        </div>
+        <div class="movie-card bg-gray-900 rounded-lg overflow-hidden gold-border opacity-50">
+            <img src="https://via.placeholder.com/300x450/111/d4af37?text=Coming+Soon" alt="Poster">
+        </div>
+    </div>
+</body>
+</html>
